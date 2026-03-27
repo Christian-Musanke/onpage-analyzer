@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLang } from "@/components/lang-provider";
 
 type MainNodeData = {
   url: string;
@@ -23,13 +24,14 @@ function getHostname(url: string): string {
 
 function MainNodeComponent({ data }: NodeProps) {
   const { url, status } = data as unknown as MainNodeData;
+  const { t } = useLang();
 
   return (
     <Tooltip>
       <TooltipTrigger render={<div />}>
         <div className="min-w-[160px] rounded-xl bg-primary px-4 py-3 text-primary-foreground shadow-lg">
           <div className="text-center">
-            <p className="font-medium opacity-70" style={{ fontSize: "calc(1.25rem * var(--graph-font-scale, 1))" }}>Analysierte Seite</p>
+            <p className="font-medium opacity-70" style={{ fontSize: "calc(1.25rem * var(--graph-font-scale, 1))" }}>{t.graph.analyzedPage}</p>
             <p className="mt-1 font-semibold" style={{ fontSize: "calc(1.875rem * var(--graph-font-scale, 1))" }}>
               {getHostname(url)}
             </p>

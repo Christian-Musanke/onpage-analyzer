@@ -5,12 +5,15 @@ export interface GraphSettings {
   nodeGap: number;
   /** Multiplier applied to all node label font sizes (1 = default). */
   fontScale: number;
+  /** Only show links that appear inside a heading section. */
+  onlyHeadlineLinks: boolean;
 }
 
 export const DEFAULT_GRAPH_SETTINGS: GraphSettings = {
   collapseChains: true,
   nodeGap: 10,
   fontScale: 1,
+  onlyHeadlineLinks: false,
 };
 
 const STORAGE_KEY = "graph-settings";

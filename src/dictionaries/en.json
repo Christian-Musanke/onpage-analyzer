@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "OnPage SEO Analyzer",
+    "description": "Analyze on-page SEO factors and link structures"
+  },
+  "searchBar": {
+    "title": "SEO Analyzer",
+    "placeholder": "Enter URL, e.g. https://example.com",
+    "analyze": "Analyze",
+    "themeToggle": "Toggle theme"
+  },
+  "emptyState": {
+    "noUrl": "No URL analyzed",
+    "instruction": "Enter a URL above and click",
+    "analyze": "Analyze",
+    "click": ""
+  },
+  "errorBanner": {
+    "title": "Analysis error",
+    "retry": "Try again"
+  },
+  "analyzer": {
+    "failed": "Analysis failed",
+    "unknownError": "An unknown error occurred"
+  },
+  "sidebar": {
+    "seoBasics": "SEO Basics",
+    "robots": "Robots",
+    "headingStructure": "Heading Structure",
+    "media": "Media",
+    "structuredData": "Structured Data",
+    "metrics": "Metrics"
+  },
+  "primaryInfo": {
+    "characters": "characters",
+    "notPresent": "Not present",
+    "optimal": "Optimal",
+    "acceptable": "Acceptable",
+    "notOptimal": "Not optimal",
+    "articleDates": "Article Dates",
+    "published": "Published",
+    "lastModified": "Last Modified",
+    "created": "Created",
+    "author": "Author",
+    "authors": "Authors"
+  },
+  "headingTree": {
+    "noHeadings": "No headings found",
+    "noContent": "No content in this section",
+    "noH1": "No H1 tag present",
+    "multipleH1": "{count} H1 tags (only 1 recommended)",
+    "firstNotH1": "First heading is H{actual} instead of H1",
+    "skippedLevel": "H{from} \u2192 H{to} (H{expected} missing)",
+    "clearFilter": "Clear filter",
+    "showSectionLinks": "Show links for this section"
+  },
+  "mediaAccordion": {
+    "images": "Images",
+    "videos": "Videos",
+    "noImages": "No images found",
+    "noVideos": "No videos found",
+    "withoutAlt": "without ALT",
+    "noAltTag": "No ALT tag",
+    "imageLoadFailed": "Image could not be loaded",
+    "openDirectly": "Open directly",
+    "imageLoading": "Loading image\u2026"
+  },
+  "schemaDisplay": {
+    "noSchema": "No structured schema found",
+    "valid": "No issues found",
+    "error": "error",
+    "errors": "errors",
+    "warning": "warning",
+    "warnings": "warnings"
+  },
+  "secondaryMetrics": {
+    "wordCount": "Word Count",
+    "links": "Links",
+    "brokenLinks": "Broken Links",
+    "textHtml": "Text/HTML",
+    "topKeywords": "Top Keywords",
+    "performance": "Performance",
+    "altTextAudit": "Alt-Text Audit",
+    "anchorTexts": "Anchor Texts",
+    "readability": "Readability",
+    "aiContent": "AI Content",
+    "intExtSubtitle": "{int} int. / {ext} ext.",
+    "missing": "{count} missing",
+    "allPresent": "All present",
+    "uniqueTexts": "unique texts",
+    "empty": "(empty)",
+    "wordCountModal": {
+      "text": "The page contains a total of {count} words."
+    },
+    "linksModal": {
+      "title": "Link Ratio",
+      "internal": "Internal Links",
+      "external": "External Links",
+      "total": "Total"
+    },
+    "brokenModal": {
+      "noIssues": "No broken links found."
+    },
+    "textHtmlModal": {
+      "title": "Text-to-HTML Ratio",
+      "text": "The text-to-HTML ratio is {ratio}.",
+      "hint": "A value between 25% and 70% is considered optimal."
+    },
+    "keywordsModal": {
+      "noKeywords": "No keywords found.",
+      "list": "List",
+      "wordCloud": "Word Cloud"
+    },
+    "performanceModal": {
+      "loadTime": "Load Time",
+      "pageSize": "Page Size"
+    },
+    "altTextModal": {
+      "totalImages": "Total images",
+      "withAlt": "With alt text",
+      "withoutAlt": "Without alt text",
+      "imagesWithoutAlt": "Images without alt text:"
+    },
+    "anchorTextModal": {
+      "title": "Anchor Text Distribution",
+      "noLinks": "No links found.",
+      "linksCount": "{count} Links"
+    },
+    "readabilityModal": {
+      "title": "Readability (Flesch-DE)",
+      "fleschIndex": "Flesch-Amstad Index",
+      "description": "The Flesch index evaluates readability based on sentence length and syllable count. Higher values indicate easier readability.",
+      "veryEasy": "Very easy",
+      "easy": "Easy",
+      "moderate": "Moderate",
+      "difficult": "Difficult",
+      "veryDifficult": "Very difficult",
+      "medium": "Medium",
+      "scaleHard": "Hard",
+      "scaleEasy": "Easy"
+    },
+    "aiContentModal": {
+      "title": "AI Content Detection",
+      "subtitle": "Statistical heuristic analysis",
+      "description": "This analysis uses statistical indicators such as vocabulary diversity, sentence length variance, and common AI phrases. The result is an estimate, not a definitive classification.",
+      "veryLikely": "Very likely AI",
+      "likely": "Likely AI",
+      "unlikely": "Likely human",
+      "veryUnlikely": "Very likely human",
+      "vocabDiversity": "Vocabulary Diversity (TTR)",
+      "sentenceVariance": "Sentence Length Variance",
+      "aiPhrases": "AI Phrases Detected",
+      "detectedPhrases": "Detected AI-typical phrases:",
+      "scaleHuman": "Human",
+      "scaleAi": "AI"
+    }
+  },
+  "confirmDialog": {
+    "title": "Analyze new URL?",
+    "internal": "Internal",
+    "external": "External",
+    "anchorText": "Anchor text",
+    "titleLabel": "Title",
+    "metaDescription": "Meta Description",
+    "notAvailable": "Not available",
+    "headingStructure": "Heading Structure",
+    "moreHeadings": "+{count} more headings",
+    "noHeadings": "No headings found",
+    "loadingPreview": "Loading preview\u2026",
+    "cancel": "Cancel",
+    "analyze": "Analyze"
+  },
+  "settingsDialog": {
+    "tooltip": "Settings",
+    "title": "Graph Settings",
+    "description": "Customize the appearance and layout of the graph.",
+    "collapseChains": "Collapse paths",
+    "collapseChainsDesc": "Merge single-child path segments into one node.",
+    "onlyHeadlineLinks": "Headline links only",
+    "onlyHeadlineLinksDesc": "Only show links that appear inside a heading section.",
+    "fontSize": "Font Size",
+    "nodeGap": "Node Gap",
+    "reset": "Reset"
+  },
+  "graph": {
+    "alignNodes": "Align nodes (resolve overlaps)",
+    "fitView": "Fit view",
+    "showing": "Showing",
+    "moreLinks": "+{count} more links",
+    "analyzedPage": "Analyzed Page",
+    "path": "Path",
+    "link": "Link",
+    "linksPlural": "Links",
+    "groupTooltip": "Grouping node \u2013 this path is not directly linked but groups subordinate links.",
+    "refitFrame": "Refit frame"
+  },
+  "metricDetailModal": {
+    "detailsAbout": "Details about"
+  },
+  "langToggle": {
+    "switchLang": "Zu Deutsch wechseln"
+  }
+}

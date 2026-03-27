@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "title": "OnPage SEO Analyzer",
+    "description": "On-Page SEO-Faktoren und Linkstrukturen analysieren"
+  },
+  "searchBar": {
+    "title": "SEO Analyzer",
+    "placeholder": "URL eingeben, z.B. https://example.com",
+    "analyze": "Analysieren",
+    "themeToggle": "Theme wechseln"
+  },
+  "emptyState": {
+    "noUrl": "Keine URL analysiert",
+    "instruction": "URL oben eingeben und",
+    "analyze": "Analysieren",
+    "click": "klicken"
+  },
+  "errorBanner": {
+    "title": "Fehler bei der Analyse",
+    "retry": "Erneut versuchen"
+  },
+  "analyzer": {
+    "failed": "Analyse fehlgeschlagen",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+  },
+  "sidebar": {
+    "seoBasics": "SEO-Grundlagen",
+    "robots": "Robots",
+    "headingStructure": "Heading-Struktur",
+    "media": "Medien",
+    "structuredData": "Structured Data",
+    "metrics": "Metriken"
+  },
+  "primaryInfo": {
+    "characters": "Zeichen",
+    "notPresent": "Nicht vorhanden",
+    "optimal": "Optimal",
+    "acceptable": "Akzeptabel",
+    "notOptimal": "Nicht optimal",
+    "articleDates": "Artikel-Daten",
+    "published": "Veröffentlicht",
+    "lastModified": "Zuletzt bearbeitet",
+    "created": "Erstellt",
+    "author": "Autor",
+    "authors": "Autoren"
+  },
+  "headingTree": {
+    "noHeadings": "Keine Headings gefunden",
+    "noContent": "Kein Inhalt in diesem Abschnitt",
+    "noH1": "Kein H1-Tag vorhanden",
+    "multipleH1": "{count} H1-Tags (nur 1 empfohlen)",
+    "firstNotH1": "Erstes Heading ist H{actual} statt H1",
+    "skippedLevel": "H{from} \u2192 H{to} (H{expected} fehlt)",
+    "clearFilter": "Filter aufheben",
+    "showSectionLinks": "Links dieses Abschnitts anzeigen"
+  },
+  "mediaAccordion": {
+    "images": "Bilder",
+    "videos": "Videos",
+    "noImages": "Keine Bilder gefunden",
+    "noVideos": "Keine Videos gefunden",
+    "withoutAlt": "ohne ALT",
+    "noAltTag": "Kein ALT-Tag",
+    "imageLoadFailed": "Bild konnte nicht geladen werden",
+    "openDirectly": "Direkt öffnen",
+    "imageLoading": "Bild wird geladen\u2026"
+  },
+  "schemaDisplay": {
+    "noSchema": "Kein strukturiertes Schema gefunden",
+    "valid": "Keine Probleme gefunden",
+    "error": "Fehler",
+    "errors": "Fehler",
+    "warning": "Warnung",
+    "warnings": "Warnungen"
+  },
+  "secondaryMetrics": {
+    "wordCount": "Wortanzahl",
+    "links": "Links",
+    "brokenLinks": "Broken Links",
+    "textHtml": "Text/HTML",
+    "topKeywords": "Top Keywords",
+    "performance": "Performance",
+    "altTextAudit": "Alt-Text Audit",
+    "anchorTexts": "Anchor-Texte",
+    "readability": "Lesbarkeit",
+    "aiContent": "KI-Inhalt",
+    "intExtSubtitle": "{int} int. / {ext} ext.",
+    "missing": "{count} fehlen",
+    "allPresent": "Alle vorhanden",
+    "uniqueTexts": "einzigartige Texte",
+    "empty": "(leer)",
+    "wordCountModal": {
+      "text": "Die Seite enthält insgesamt {count} Wörter."
+    },
+    "linksModal": {
+      "title": "Link-Verhältnis",
+      "internal": "Interne Links",
+      "external": "Externe Links",
+      "total": "Gesamt"
+    },
+    "brokenModal": {
+      "noIssues": "Keine fehlerhaften Links gefunden."
+    },
+    "textHtmlModal": {
+      "title": "Text-zu-HTML-Verhältnis",
+      "text": "Das Text-zu-HTML-Verhältnis beträgt {ratio}.",
+      "hint": "Ein Wert zwischen 25% und 70% gilt als optimal."
+    },
+    "keywordsModal": {
+      "noKeywords": "Keine Keywords gefunden.",
+      "list": "Liste",
+      "wordCloud": "Word Cloud"
+    },
+    "performanceModal": {
+      "loadTime": "Ladezeit",
+      "pageSize": "Seitengröße"
+    },
+    "altTextModal": {
+      "totalImages": "Bilder gesamt",
+      "withAlt": "Mit Alt-Text",
+      "withoutAlt": "Ohne Alt-Text",
+      "imagesWithoutAlt": "Bilder ohne Alt-Text:"
+    },
+    "anchorTextModal": {
+      "title": "Anchor-Text-Verteilung",
+      "noLinks": "Keine Links gefunden.",
+      "linksCount": "{count} Links"
+    },
+    "readabilityModal": {
+      "title": "Lesbarkeit (Flesch-DE)",
+      "fleschIndex": "Flesch-Amstad-Index",
+      "description": "Der Flesch-Index bewertet die Lesbarkeit anhand von Satzlänge und Silbenanzahl. Höhere Werte bedeuten leichtere Lesbarkeit.",
+      "veryEasy": "Sehr leicht",
+      "easy": "Leicht",
+      "moderate": "Mittelschwer",
+      "difficult": "Schwer",
+      "veryDifficult": "Sehr schwer",
+      "medium": "Mittel",
+      "scaleHard": "Schwer",
+      "scaleEasy": "Leicht"
+    },
+    "aiContentModal": {
+      "title": "KI-Inhaltserkennung",
+      "subtitle": "Statistische Heuristik-Analyse",
+      "description": "Diese Analyse verwendet statistische Indikatoren wie Vokabeldiversität, Satzlängen-Varianz und typische KI-Phrasen. Das Ergebnis ist eine Einschätzung, keine definitive Klassifizierung.",
+      "veryLikely": "Sehr wahrscheinlich KI",
+      "likely": "Wahrscheinlich KI",
+      "unlikely": "Wahrscheinlich menschlich",
+      "veryUnlikely": "Sehr wahrscheinlich menschlich",
+      "vocabDiversity": "Vokabel-Diversität (TTR)",
+      "sentenceVariance": "Satzlängen-Varianz",
+      "aiPhrases": "KI-Phrasen erkannt",
+      "detectedPhrases": "Erkannte KI-typische Phrasen:",
+      "scaleHuman": "Menschlich",
+      "scaleAi": "KI"
+    }
+  },
+  "confirmDialog": {
+    "title": "Neue URL analysieren?",
+    "internal": "Intern",
+    "external": "Extern",
+    "anchorText": "Ankertext",
+    "titleLabel": "Titel",
+    "metaDescription": "Meta Description",
+    "notAvailable": "Nicht verfügbar",
+    "headingStructure": "Überschriften-Struktur",
+    "moreHeadings": "+{count} weitere Überschriften",
+    "noHeadings": "Keine Überschriften gefunden",
+    "loadingPreview": "Lade Vorschau\u2026",
+    "cancel": "Abbrechen",
+    "analyze": "Analysieren"
+  },
+  "settingsDialog": {
+    "tooltip": "Einstellungen",
+    "title": "Graph-Einstellungen",
+    "description": "Darstellung und Layout des Graphen anpassen.",
+    "collapseChains": "Pfade zusammenfassen",
+    "collapseChainsDesc": "Einzelkind-Pfadsegmente zu einem Knoten verschmelzen.",
+    "onlyHeadlineLinks": "Nur Headline-Links",
+    "onlyHeadlineLinksDesc": "Nur Links anzeigen, die innerhalb eines Heading-Abschnitts vorkommen.",
+    "fontSize": "Schriftgröße",
+    "nodeGap": "Knotenabstand",
+    "reset": "Zurücksetzen"
+  },
+  "graph": {
+    "alignNodes": "Nodes ausrichten (Overlaps auflösen)",
+    "fitView": "Ansicht anpassen",
+    "showing": "Anzeige",
+    "moreLinks": "+{count} weitere Links",
+    "analyzedPage": "Analysierte Seite",
+    "path": "Pfad",
+    "link": "Link",
+    "linksPlural": "Links",
+    "groupTooltip": "Gruppierungsknoten \u2013 dieser Pfad wird nicht direkt verlinkt, fasst aber untergeordnete Links zusammen.",
+    "refitFrame": "Frame anpassen"
+  },
+  "metricDetailModal": {
+    "detailsAbout": "Details zu"
+  },
+  "langToggle": {
+    "switchLang": "Switch to English"
+  }
+}

@@ -17,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLang } from "@/components/lang-provider";
 
 interface SettingsDialogProps {
   settings: GraphSettings;
@@ -24,6 +25,8 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
+  const { t } = useLang();
+
   return (
     <Dialog>
       <Tooltip>
@@ -42,14 +45,14 @@ export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
         >
           <Settings className="size-4" />
         </TooltipTrigger>
-        <TooltipContent side="right">Einstellungen</TooltipContent>
+        <TooltipContent side="right">{t.settingsDialog.tooltip}</TooltipContent>
       </Tooltip>
 
       <DialogContent maxWidth="24rem">
         <DialogHeader>
-          <DialogTitle>Graph-Einstellungen</DialogTitle>
+          <DialogTitle>{t.settingsDialog.title}</DialogTitle>
           <DialogDescription>
-            Darstellung und Layout des Graphen anpassen.
+            {t.settingsDialog.description}
           </DialogDescription>
         </DialogHeader>
 
@@ -57,9 +60,9 @@ export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
           {/* ── Collapse chains toggle ────────────────────────── */}
           <label className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-medium">Pfade zusammenfassen</p>
+              <p className="text-sm font-medium">{t.settingsDialog.collapseChains}</p>
               <p className="text-xs text-muted-foreground">
-                Einzelkind-Pfadsegmente zu einem Knoten verschmelzen.
+                {t.settingsDialog.collapseChainsDesc}
               </p>
             </div>
             <input
@@ -70,10 +73,26 @@ export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
             />
           </label>
 
+          {/* ── Only headline links toggle ──────────────────────── */}
+          <label className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">{t.settingsDialog.onlyHeadlineLinks}</p>
+              <p className="text-xs text-muted-foreground">
+                {t.settingsDialog.onlyHeadlineLinksDesc}
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={settings.onlyHeadlineLinks}
+              onChange={(e) => onChange({ onlyHeadlineLinks: e.target.checked })}
+              className="size-4 accent-primary"
+            />
+          </label>
+
           {/* ── Font scale slider ─────────────────────────────── */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Schriftgröße</p>
+              <p className="text-sm font-medium">{t.settingsDialog.fontSize}</p>
               <span className="text-xs tabular-nums text-muted-foreground">
                 {Math.round(settings.fontScale * 100)}%
               </span>
@@ -98,7 +117,7 @@ export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
           {/* ── Node gap slider ───────────────────────────────── */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Knotenabstand</p>
+              <p className="text-sm font-medium">{t.settingsDialog.nodeGap}</p>
               <span className="text-xs tabular-nums text-muted-foreground">
                 {settings.nodeGap}px
               </span>
@@ -127,7 +146,7 @@ export function SettingsDialog({ settings, onChange }: SettingsDialogProps) {
             className="self-end"
             onClick={() => onChange(DEFAULT_GRAPH_SETTINGS)}
           >
-            Zurücksetzen
+            {t.settingsDialog.reset}
           </Button>
         </div>
       </DialogContent>

@@ -54,7 +54,12 @@ function reducer(state: AnalyzerState, action: AnalyzerAction): AnalyzerState {
   }
 }
 
-export function useAnalyzer() {
+interface AnalyzerTranslations {
+  failed: string;
+  unknownError: string;
+}
+
+export function useAnalyzer(translations: AnalyzerTranslations) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const analyzeUrl = useCallback(async (url: string) => {
@@ -70,7 +75,7 @@ export function useAnalyzer() {
       if (!response.ok) {
         const body = await response.json().catch(() => null);
         throw new Error(
-          body?.error ?? `Analyse fehlgeschlagen (HTTP ${response.status})`
+          body?.error ?? `${translations.failed} (HTTP ${response.status})`
         );
       }
 
@@ -78,10 +83,10 @@ export function useAnalyzer() {
       dispatch({ type: "ANALYZE_SUCCESS", data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Ein unbekannter Fehler ist aufgetreten";
+        err instanceof Error ? err.message : translations.unknownError;
       dispatch({ type: "ANALYZE_ERROR", error: message });
     }
-  }, []);
+  }, [translations.failed, translations.unknownError]);
 
   const updateLinkStatuses = useCallback(
     (statuses: Record<string, LinkStatus>) => {

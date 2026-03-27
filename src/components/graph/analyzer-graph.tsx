@@ -17,7 +17,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { AlignVerticalSpaceAround, Maximize, X } from "lucide-react";
 
-import type { LinkData, LinkStatus } from "@/lib/types";
+import type { HeadingNode, LinkData, LinkStatus } from "@/lib/types";
 import {
   loadGraphSettings,
   saveGraphSettings,
@@ -41,6 +41,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLang } from "@/components/lang-provider";
+import { interp } from "@/lib/i18n";
+import {
+  extractHrefsFromSubtree,
+  hrefVariants,
+} from "@/hooks/use-hovered-link";
 
 const nodeTypes = {
   mainNode: MainNode,
@@ -56,6 +62,7 @@ const ALIGN_TRANSITION_MS = 300;
 interface AnalyzerGraphProps {
   links: LinkData[];
   linkStatuses: Record<string, LinkStatus>;
+  headings: HeadingNode[];
   currentUrl: string;
   currentStatus: number;
   onNavigate: (url: string) => void;
@@ -120,12 +127,16 @@ function getDescendants(
 function AnalyzerGraphInner({
   links,
   linkStatuses,
+  headings,
   currentUrl,
   onNavigate,
   overflow: overflowProp,
   focusedSectionLabel,
   onClearFocus,
 }: AnalyzerGraphProps) {
+  // ── Translations ────────────────────────────────────────────────────
+  const { t } = useLang();
+
   // ── Settings ────────────────────────────────────────────────────────
 
   const [settings, setSettings] = useState<GraphSettings>(loadGraphSettings);
@@ -138,11 +149,30 @@ function AnalyzerGraphInner({
     });
   }, []);
 
+  // ── Filter links to only those inside heading sections ──────────────
+  const effectiveLinks = useMemo(() => {
+    if (!settings.onlyHeadlineLinks || headings.length === 0) return links;
+
+    // Build a lookup set of all hrefs found in heading content
+    const headingHrefs = new Set<string>();
+    for (const heading of headings) {
+      for (const href of extractHrefsFromSubtree(heading)) {
+        headingHrefs.add(href);
+        for (const v of hrefVariants(href)) headingHrefs.add(v);
+      }
+    }
+
+    return links.filter((link) => {
+      const variants = hrefVariants(link.href);
+      return variants.some((v) => headingHrefs.has(v));
+    });
+  }, [links, headings, settings.onlyHeadlineLinks]);
+
   const {
     nodes: layoutNodes,
     edges,
     overflow: layoutOverflow,
-  } = useRadialLayout(links, currentUrl, settings);
+  } = useRadialLayout(effectiveLinks, currentUrl, settings);
 
   const overflow = overflowProp ?? layoutOverflow;
 
@@ -425,7 +455,7 @@ function AnalyzerGraphInner({
             <AlignVerticalSpaceAround className="size-4" />
           </TooltipTrigger>
           <TooltipContent side="right">
-            Nodes ausrichten (Overlaps auflösen)
+            {t.graph.alignNodes}
           </TooltipContent>
         </Tooltip>
 
@@ -443,7 +473,7 @@ function AnalyzerGraphInner({
             <Maximize className="size-4" />
           </TooltipTrigger>
           <TooltipContent side="right">
-            Ansicht anpassen
+            {t.graph.fitView}
           </TooltipContent>
         </Tooltip>
 
@@ -454,7 +484,7 @@ function AnalyzerGraphInner({
       {focusedSectionLabel && (
         <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 py-1 pl-3 pr-1.5 text-xs font-medium text-primary shadow-sm backdrop-blur-sm">
           <span className="max-w-[200px] truncate">
-            Anzeige: {focusedSectionLabel}
+            {t.graph.showing}: {focusedSectionLabel}
           </span>
           <button
             onClick={onClearFocus}
@@ -467,7 +497,7 @@ function AnalyzerGraphInner({
 
       {overflow > 0 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground shadow">
-          +{overflow} weitere Links
+          {interp(t.graph.moreLinks, { count: overflow })}
         </div>
       )}
 

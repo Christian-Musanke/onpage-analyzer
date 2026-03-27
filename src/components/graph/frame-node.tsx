@@ -4,6 +4,7 @@ import React, { useCallback } from "react";
 import { useReactFlow, type NodeProps } from "@xyflow/react";
 import { RefreshCw } from "lucide-react";
 import { refitFrame } from "@/components/graph/compute-frames";
+import { useLang } from "@/components/lang-provider";
 
 type FrameNodeData = {
   label: string;
@@ -18,6 +19,7 @@ function FrameNodeComponent({ id, data }: NodeProps) {
     data as unknown as FrameNodeData;
 
   const { getNodes, setNodes } = useReactFlow();
+  const { t } = useLang();
 
   const handleRefit = useCallback(() => {
     const bounds = refitFrame(childNodeIds, getNodes());
@@ -61,7 +63,7 @@ function FrameNodeComponent({ id, data }: NodeProps) {
               ? "text-internal hover:bg-internal/10"
               : "text-external hover:bg-external/10"
           }`}
-          title="Frame anpassen"
+          title={t.graph.refitFrame}
         >
           <RefreshCw
             style={{

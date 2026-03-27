@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLang } from "@/components/lang-provider";
 import type { LinkData, LinkStatus } from "@/lib/types";
 
 type LinkNodeData = {
@@ -20,6 +21,7 @@ type LinkNodeData = {
 function LinkNodeComponent({ data }: NodeProps) {
   const { link, status, segmentLabel } = data as unknown as LinkNodeData;
   const anchorText = link.text?.trim();
+  const { t } = useLang();
 
   return (
     <Tooltip>
@@ -58,7 +60,7 @@ function LinkNodeComponent({ data }: NodeProps) {
         <p className="break-all font-mono text-sm">{link.href}</p>
         {anchorText && (
           <p className="text-sm opacity-80">
-            Ankertext: &quot;{anchorText}&quot;
+            {t.confirmDialog.anchorText}: &quot;{anchorText}&quot;
           </p>
         )}
       </TooltipContent>

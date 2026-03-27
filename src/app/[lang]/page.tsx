@@ -11,6 +11,7 @@ import {
   HoveredLinkProvider,
   filterLinksForSection,
 } from "@/hooks/use-hovered-link";
+import { useLang } from "@/components/lang-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { HeadingNode } from "@/lib/types";
 
@@ -41,15 +42,17 @@ function GraphSkeleton() {
 }
 
 function EmptyState() {
+  const { t } = useLang();
+
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
       <Globe className="h-16 w-16 opacity-30" />
       <div className="text-center">
-        <p className="text-lg font-medium">Keine URL analysiert</p>
+        <p className="text-lg font-medium">{t.emptyState.noUrl}</p>
         <p className="mt-1 flex items-center gap-1 text-sm">
-          URL oben eingeben und <ArrowRight className="h-3 w-3 inline" />{" "}
-          <span className="font-medium text-foreground">Analysieren</span>{" "}
-          klicken
+          {t.emptyState.instruction} <ArrowRight className="h-3 w-3 inline" />{" "}
+          <span className="font-medium text-foreground">{t.emptyState.analyze}</span>{" "}
+          {t.emptyState.click}
         </p>
       </div>
     </div>
@@ -63,16 +66,18 @@ function ErrorBanner({
   message: string;
   onRetry?: () => void;
 }) {
+  const { t } = useLang();
+
   return (
     <div className="mx-4 mt-3 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-      <p className="font-medium">Fehler bei der Analyse</p>
+      <p className="font-medium">{t.errorBanner.title}</p>
       <p className="mt-1">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
           className="mt-2 text-xs underline hover:no-underline"
         >
-          Erneut versuchen
+          {t.errorBanner.retry}
         </button>
       )}
     </div>
@@ -80,6 +85,8 @@ function ErrorBanner({
 }
 
 export default function HomePage() {
+  const { t } = useLang();
+
   const {
     currentUrl,
     analysisData,
@@ -88,7 +95,10 @@ export default function HomePage() {
     error,
     analyzeUrl,
     updateLinkStatuses,
-  } = useAnalyzer();
+  } = useAnalyzer({
+    failed: t.analyzer.failed,
+    unknownError: t.analyzer.unknownError,
+  });
 
   useLinkStatus(analysisData?.links, updateLinkStatuses);
 
@@ -144,6 +154,7 @@ export default function HomePage() {
               <AnalyzerGraph
                 links={filteredLinks}
                 linkStatuses={linkStatuses}
+                headings={analysisData.seo.headings}
                 currentUrl={analysisData.url}
                 currentStatus={analysisData.status}
                 onNavigate={analyzeUrl}

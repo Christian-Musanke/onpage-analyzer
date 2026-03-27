@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { useLang } from "@/components/lang-provider"
+import { interp, type Dictionary } from "@/lib/i18n"
 import type { HeadingNode } from "@/lib/types"
 import {
   Tooltip,
@@ -50,7 +52,7 @@ const badgeColors: Record<number, string> = {
 
 // ── Modal content: renders actual HTML content of the section ────────────
 
-function HeadingModalContent({ node }: { node: HeadingNode }) {
+function HeadingModalContent({ node, t }: { node: HeadingNode; t: Dictionary["headingTree"] }) {
   const hasContent = node.contentHtml.trim().length > 0
   const hasChildren = node.children.length > 0
 
@@ -131,7 +133,7 @@ function HeadingModalContent({ node }: { node: HeadingNode }) {
 
       {!hasContent && !hasChildren && (
         <p className="text-sm text-muted-foreground italic">
-          Kein Inhalt in diesem Abschnitt
+          {t.noContent}
         </p>
       )}
     </div>
@@ -146,12 +148,14 @@ function HeadingItem({
   hoveredVariants,
   focusedSection,
   onFocusSection,
+  t,
 }: {
   node: HeadingNode
   onSelect: (node: HeadingNode) => void
   hoveredVariants: string[]
   focusedSection: HeadingNode | null
   onFocusSection: (node: HeadingNode) => void
+  t: Dictionary["headingTree"]
 }) {
   const [open, setOpen] = useState(true)
   const hasChildren = node.children.length > 0
@@ -234,8 +238,8 @@ function HeadingItem({
           </TooltipTrigger>
           <TooltipContent side="right">
             {isFocused
-              ? "Filter aufheben"
-              : "Links dieses Abschnitts anzeigen"}
+              ? t.clearFilter
+              : t.showSectionLinks}
           </TooltipContent>
         </Tooltip>
       </div>
@@ -249,6 +253,7 @@ function HeadingItem({
               hoveredVariants={hoveredVariants}
               focusedSection={focusedSection}
               onFocusSection={onFocusSection}
+              t={t}
             />
           ))}
         </div>
@@ -259,10 +264,9 @@ function HeadingItem({
 
 // ── Heading hierarchy validation ─────────────────────────────────────────
 
-function validateHeadings(headings: HeadingNode[]): string[] {
+function validateHeadings(headings: HeadingNode[], t: Dictionary["headingTree"]): string[] {
   const issues: string[] = []
 
-  // Flatten the tree into document order
   const flat: number[] = []
   function walk(nodes: HeadingNode[]) {
     for (const n of nodes) {
@@ -274,21 +278,18 @@ function validateHeadings(headings: HeadingNode[]): string[] {
 
   if (flat.length === 0) return issues
 
-  // Missing H1
   const h1Count = flat.filter((l) => l === 1).length
-  if (h1Count === 0) issues.push("Kein H1-Tag vorhanden")
-  else if (h1Count > 1) issues.push(`${h1Count} H1-Tags (nur 1 empfohlen)`)
+  if (h1Count === 0) issues.push(t.noH1)
+  else if (h1Count > 1) issues.push(interp(t.multipleH1, { count: h1Count }))
 
-  // First heading should be H1
   if (flat[0] !== 1 && h1Count === 0) {
-    issues.push(`Erstes Heading ist H${flat[0]} statt H1`)
+    issues.push(interp(t.firstNotH1, { actual: flat[0] }))
   }
 
-  // Skipped levels
   for (let i = 1; i < flat.length; i++) {
     const gap = flat[i] - flat[i - 1]
     if (gap > 1) {
-      issues.push(`H${flat[i - 1]} → H${flat[i]} (H${flat[i - 1] + 1} fehlt)`)
+      issues.push(interp(t.skippedLevel, { from: flat[i - 1], to: flat[i], expected: flat[i - 1] + 1 }))
     }
   }
 
@@ -302,6 +303,7 @@ export function HeadingTree({
   focusedSection,
   onFocusSection,
 }: HeadingTreeProps) {
+  const { t } = useLang()
   const [selectedHeading, setSelectedHeading] = useState<HeadingNode | null>(
     null,
   )
@@ -311,12 +313,12 @@ export function HeadingTree({
     [hoveredHref],
   )
 
-  const issues = useMemo(() => validateHeadings(headings), [headings])
+  const issues = useMemo(() => validateHeadings(headings, t.headingTree), [headings, t.headingTree])
 
   if (headings.length === 0) {
     return (
       <p className="text-sm text-muted-foreground italic">
-        Keine Headings gefunden
+        {t.headingTree.noHeadings}
       </p>
     )
   }
@@ -347,6 +349,7 @@ export function HeadingTree({
             hoveredVariants={hoveredVariants}
             focusedSection={focusedSection}
             onFocusSection={onFocusSection}
+            t={t.headingTree}
           />
         ))}
       </div>
@@ -374,7 +377,7 @@ export function HeadingTree({
                 </div>
               </DialogHeader>
               <Separator />
-              <HeadingModalContent node={selectedHeading} />
+              <HeadingModalContent node={selectedHeading} t={t.headingTree} />
             </>
           )}
         </DialogContent>

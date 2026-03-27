@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
+import { useLang } from "@/components/lang-provider"
 
 interface MetricDetailModalProps {
   open: boolean
@@ -24,13 +25,15 @@ export function MetricDetailModal({
   maxWidth = "28rem",
   children,
 }: MetricDetailModalProps) {
+  const { t } = useLang()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent maxWidth={maxWidth}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="sr-only">
-            Details zu {title}
+            {t.metricDetailModal.detailsAbout} {title}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">{children}</div>

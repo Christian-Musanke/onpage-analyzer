@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { Tabs } from "@base-ui/react/tabs"
 import {
   BookOpen,
+  Bot,
   FileText,
   Image,
   Link,
@@ -17,6 +18,8 @@ import { MetricCard } from "./metric-card"
 import { MetricDetailModal } from "./metric-detail-modal"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useLang } from "@/components/lang-provider"
+import { interp, type Dictionary } from "@/lib/i18n"
 import type {
   HeadingNode,
   KeywordEntry,
@@ -57,6 +60,7 @@ type ModalKey =
   | "altText"
   | "anchorText"
   | "readability"
+  | "aiContent"
   | null
 
 export function SecondaryMetrics({
@@ -66,6 +70,9 @@ export function SecondaryMetrics({
   headings,
   linkStatuses,
 }: SecondaryMetricsProps) {
+  const { t, lang } = useLang()
+  const sm = t.secondaryMetrics
+  const localeTag = lang === "de" ? "de-DE" : "en-US"
   const [activeModal, setActiveModal] = useState<ModalKey>(null)
 
   const brokenLinks = Object.entries(linkStatuses).filter(
@@ -76,17 +83,15 @@ export function SecondaryMetrics({
 
   const totalLinks = metrics.internalLinkCount + metrics.externalLinkCount
 
-  // Image alt text audit
   const missingAltImages = useMemo(
     () => images.filter((img) => !img.alt || img.alt.trim() === ""),
     [images],
   )
 
-  // Anchor text distribution
   const anchorTextGroups = useMemo(() => {
     const groups = new Map<string, { text: string; hrefs: string[]; isInternal: boolean }>()
     for (const link of links) {
-      const text = link.text.trim() || "(leer)"
+      const text = link.text.trim() || sm.empty
       const existing = groups.get(text)
       if (existing) {
         existing.hrefs.push(link.href)
@@ -95,38 +100,38 @@ export function SecondaryMetrics({
       }
     }
     return [...groups.values()].sort((a, b) => b.hrefs.length - a.hrefs.length)
-  }, [links])
+  }, [links, sm.empty])
 
   return (
     <>
       <div className="grid grid-cols-2 gap-2">
         <MetricCard
-          title="Wortanzahl"
-          value={metrics.wordCount.toLocaleString("de-DE")}
+          title={sm.wordCount}
+          value={metrics.wordCount.toLocaleString(localeTag)}
           icon={<FileText className="size-4" />}
           onClick={() => setActiveModal("wordCount")}
         />
         <MetricCard
-          title="Links"
+          title={sm.links}
           value={totalLinks}
-          subtitle={`${metrics.internalLinkCount} int. / ${metrics.externalLinkCount} ext.`}
+          subtitle={interp(sm.intExtSubtitle, { int: metrics.internalLinkCount, ext: metrics.externalLinkCount })}
           icon={<Link className="size-4" />}
           onClick={() => setActiveModal("links")}
         />
         <MetricCard
-          title="Broken Links"
+          title={sm.brokenLinks}
           value={brokenLinks.length}
           icon={<AlertTriangle className="size-4" />}
           onClick={() => setActiveModal("broken")}
         />
         <MetricCard
-          title="Text/HTML"
+          title={sm.textHtml}
           value={`${metrics.textToHtmlRatio.toFixed(1)}%`}
           icon={<Code className="size-4" />}
           onClick={() => setActiveModal("textHtml")}
         />
         <MetricCard
-          title="Top Keywords"
+          title={sm.topKeywords}
           value={metrics.topKeywords.length > 0 ? metrics.topKeywords[0].word : "-"}
           subtitle={
             metrics.topKeywords.length > 0
@@ -137,36 +142,43 @@ export function SecondaryMetrics({
           onClick={() => setActiveModal("keywords")}
         />
         <MetricCard
-          title="Performance"
+          title={sm.performance}
           value={formatMs(metrics.loadTimeMs)}
           subtitle={formatBytes(metrics.pageSizeBytes)}
           icon={<Gauge className="size-4" />}
           onClick={() => setActiveModal("performance")}
         />
         <MetricCard
-          title="Alt-Text Audit"
+          title={sm.altTextAudit}
           value={`${images.length - missingAltImages.length}/${images.length}`}
           subtitle={
             missingAltImages.length > 0
-              ? `${missingAltImages.length} fehlen`
-              : "Alle vorhanden"
+              ? interp(sm.missing, { count: missingAltImages.length })
+              : sm.allPresent
           }
           icon={<Image className="size-4" />}
           onClick={() => setActiveModal("altText")}
         />
         <MetricCard
-          title="Anchor-Texte"
+          title={sm.anchorTexts}
           value={anchorTextGroups.length}
-          subtitle="einzigartige Texte"
+          subtitle={sm.uniqueTexts}
           icon={<Type className="size-4" />}
           onClick={() => setActiveModal("anchorText")}
         />
         <MetricCard
-          title="Lesbarkeit"
+          title={sm.readability}
           value={metrics.readabilityScore}
-          subtitle={readabilityLabel(metrics.readabilityScore)}
+          subtitle={readabilityLabel(metrics.readabilityScore, sm.readabilityModal)}
           icon={<BookOpen className="size-4" />}
           onClick={() => setActiveModal("readability")}
+        />
+        <MetricCard
+          title={sm.aiContent}
+          value={`${metrics.aiContent.score}%`}
+          subtitle={aiContentLabel(metrics.aiContent.score, sm.aiContentModal)}
+          icon={<Bot className="size-4" />}
+          onClick={() => setActiveModal("aiContent")}
         />
       </div>
 
@@ -174,11 +186,10 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "wordCount"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Wortanzahl"
+        title={sm.wordCount}
       >
         <p className="text-sm">
-          Die Seite enthalt insgesamt{" "}
-          <strong>{metrics.wordCount.toLocaleString("de-DE")}</strong> Worter.
+          {interp(sm.wordCountModal.text, { count: metrics.wordCount.toLocaleString(localeTag) })}
         </p>
       </MetricDetailModal>
 
@@ -186,19 +197,19 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "links"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Link-Verhaltnis"
+        title={sm.linksModal.title}
       >
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Interne Links</span>
+            <span className="text-muted-foreground">{sm.linksModal.internal}</span>
             <span className="font-medium">{metrics.internalLinkCount}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Externe Links</span>
+            <span className="text-muted-foreground">{sm.linksModal.external}</span>
             <span className="font-medium">{metrics.externalLinkCount}</span>
           </div>
           <div className="flex justify-between border-t pt-2">
-            <span className="text-muted-foreground">Gesamt</span>
+            <span className="text-muted-foreground">{sm.linksModal.total}</span>
             <span className="font-semibold">{totalLinks}</span>
           </div>
         </div>
@@ -208,12 +219,12 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "broken"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Broken Links"
+        title={sm.brokenLinks}
         maxWidth="40rem"
       >
         {brokenLinks.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">
-            Keine fehlerhaften Links gefunden.
+            {sm.brokenModal.noIssues}
           </p>
         ) : (
           <div className="max-h-[60vh] space-y-2 overflow-y-auto">
@@ -252,14 +263,13 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "textHtml"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Text-zu-HTML-Verhaltnis"
+        title={sm.textHtmlModal.title}
       >
         <p className="text-sm">
-          Das Text-zu-HTML-Verhaltnis betragt{" "}
-          <strong>{metrics.textToHtmlRatio.toFixed(1)}%</strong>.
+          {interp(sm.textHtmlModal.text, { ratio: `${metrics.textToHtmlRatio.toFixed(1)}%` })}
         </p>
         <p className="text-xs text-muted-foreground">
-          Ein Wert zwischen 25% und 70% gilt als optimal.
+          {sm.textHtmlModal.hint}
         </p>
       </MetricDetailModal>
 
@@ -267,18 +277,18 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "keywords"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Top Keywords"
+        title={sm.topKeywords}
         maxWidth="36rem"
       >
         {metrics.topKeywords.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">
-            Keine Keywords gefunden.
+            {sm.keywordsModal.noKeywords}
           </p>
         ) : (
           <Tabs.Root defaultValue="list">
             <Tabs.List className="flex gap-1 rounded-lg bg-muted p-1">
-              <TabTrigger value="list">Liste</TabTrigger>
-              <TabTrigger value="cloud">Word Cloud</TabTrigger>
+              <TabTrigger value="list">{sm.keywordsModal.list}</TabTrigger>
+              <TabTrigger value="cloud">{sm.keywordsModal.wordCloud}</TabTrigger>
             </Tabs.List>
 
             <Tabs.Panel value="list" className="mt-3">
@@ -308,15 +318,15 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "performance"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Performance"
+        title={sm.performance}
       >
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Ladezeit</span>
+            <span className="text-muted-foreground">{sm.performanceModal.loadTime}</span>
             <span className="font-medium">{formatMs(metrics.loadTimeMs)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Seitengrosse</span>
+            <span className="text-muted-foreground">{sm.performanceModal.pageSize}</span>
             <span className="font-medium">
               {formatBytes(metrics.pageSizeBytes)}
             </span>
@@ -328,22 +338,22 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "altText"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Alt-Text Audit"
+        title={sm.altTextAudit}
         maxWidth="40rem"
       >
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Bilder gesamt</span>
+            <span className="text-muted-foreground">{sm.altTextModal.totalImages}</span>
             <span className="font-medium">{images.length}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Mit Alt-Text</span>
+            <span className="text-muted-foreground">{sm.altTextModal.withAlt}</span>
             <span className="font-medium text-emerald-600 dark:text-emerald-400">
               {images.length - missingAltImages.length}
             </span>
           </div>
           <div className="flex justify-between border-t pt-2">
-            <span className="text-muted-foreground">Ohne Alt-Text</span>
+            <span className="text-muted-foreground">{sm.altTextModal.withoutAlt}</span>
             <span
               className={cn(
                 "font-semibold",
@@ -359,7 +369,7 @@ export function SecondaryMetrics({
         {missingAltImages.length > 0 && (
           <div className="max-h-[40vh] space-y-2 overflow-y-auto">
             <p className="text-xs font-medium text-muted-foreground">
-              Bilder ohne Alt-Text:
+              {sm.altTextModal.imagesWithoutAlt}
             </p>
             {missingAltImages.map((img, i) => (
               <div
@@ -391,12 +401,12 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "anchorText"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Anchor-Text-Verteilung"
+        title={sm.anchorTextModal.title}
         maxWidth="40rem"
       >
         {anchorTextGroups.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">
-            Keine Links gefunden.
+            {sm.anchorTextModal.noLinks}
           </p>
         ) : (
           <div className="max-h-[60vh] space-y-1.5 overflow-y-auto">
@@ -421,7 +431,7 @@ export function SecondaryMetrics({
                     ))
                   ) : (
                     <p className="text-[11px] text-muted-foreground">
-                      {group.hrefs.length} Links
+                      {interp(sm.anchorTextModal.linksCount, { count: group.hrefs.length })}
                     </p>
                   )}
                 </div>
@@ -438,7 +448,7 @@ export function SecondaryMetrics({
       <MetricDetailModal
         open={activeModal === "readability"}
         onOpenChange={(open) => !open && setActiveModal(null)}
-        title="Lesbarkeit (Flesch-DE)"
+        title={sm.readabilityModal.title}
       >
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -452,18 +462,83 @@ export function SecondaryMetrics({
             </div>
             <div>
               <p className="font-medium">
-                {readabilityLabel(metrics.readabilityScore)}
+                {readabilityLabel(metrics.readabilityScore, sm.readabilityModal)}
               </p>
               <p className="text-xs text-muted-foreground">
-                Flesch-Amstad-Index
+                {sm.readabilityModal.fleschIndex}
               </p>
             </div>
           </div>
-          <ReadabilityScale score={metrics.readabilityScore} />
+          <ReadabilityScale score={metrics.readabilityScore} t={sm.readabilityModal} />
           <p className="text-xs text-muted-foreground">
-            Der Flesch-Index bewertet die Lesbarkeit anhand von
-            Satzlange und Silbenanzahl. Hohere Werte bedeuten leichtere
-            Lesbarkeit.
+            {sm.readabilityModal.description}
+          </p>
+        </div>
+      </MetricDetailModal>
+
+      {/* AI Content Modal */}
+      <MetricDetailModal
+        open={activeModal === "aiContent"}
+        onOpenChange={(open) => !open && setActiveModal(null)}
+        title={sm.aiContentModal.title}
+      >
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={cn(
+                "flex size-14 items-center justify-center rounded-full text-xl font-bold",
+                aiContentColor(metrics.aiContent.score),
+              )}
+            >
+              {metrics.aiContent.score}
+            </div>
+            <div>
+              <p className="font-medium">
+                {aiContentLabel(metrics.aiContent.score, sm.aiContentModal)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {sm.aiContentModal.subtitle}
+              </p>
+            </div>
+          </div>
+
+          <AiContentScale score={metrics.aiContent.score} t={sm.aiContentModal} />
+
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{sm.aiContentModal.vocabDiversity}</span>
+              <span className="font-medium">{metrics.aiContent.vocabularyDiversity.toFixed(3)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{sm.aiContentModal.sentenceVariance}</span>
+              <span className="font-medium">{metrics.aiContent.sentenceLengthStdDev.toFixed(1)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">{sm.aiContentModal.aiPhrases}</span>
+              <span className="font-medium">{metrics.aiContent.aiPhraseCount}</span>
+            </div>
+          </div>
+
+          {metrics.aiContent.aiPhrases.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                {sm.aiContentModal.detectedPhrases}
+              </p>
+              <div className="max-h-[30vh] space-y-1 overflow-y-auto">
+                {metrics.aiContent.aiPhrases.map((phrase, i) => (
+                  <div
+                    key={i}
+                    className="rounded-md border px-2.5 py-1.5 text-xs italic text-muted-foreground"
+                  >
+                    &ldquo;{phrase}&rdquo;
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            {sm.aiContentModal.description}
           </p>
         </div>
       </MetricDetailModal>
@@ -533,12 +608,12 @@ function KeywordCloud({ keywords }: { keywords: KeywordEntry[] }) {
 
 // ── Readability helpers ─────────────────────────────────────────────────
 
-function readabilityLabel(score: number): string {
-  if (score >= 70) return "Sehr leicht"
-  if (score >= 60) return "Leicht"
-  if (score >= 50) return "Mittelschwer"
-  if (score >= 30) return "Schwer"
-  return "Sehr schwer"
+function readabilityLabel(score: number, t: Dictionary["secondaryMetrics"]["readabilityModal"]): string {
+  if (score >= 70) return t.veryEasy
+  if (score >= 60) return t.easy
+  if (score >= 50) return t.moderate
+  if (score >= 30) return t.difficult
+  return t.veryDifficult
 }
 
 function readabilityColor(score: number): string {
@@ -549,19 +624,19 @@ function readabilityColor(score: number): string {
   return "bg-red-500/15 text-red-700 dark:text-red-400"
 }
 
-const READABILITY_LEVELS = [
-  { label: "Sehr schwer", min: 0, max: 30 },
-  { label: "Schwer", min: 30, max: 50 },
-  { label: "Mittel", min: 50, max: 60 },
-  { label: "Leicht", min: 60, max: 70 },
-  { label: "Sehr leicht", min: 70, max: 100 },
-] as const
+function ReadabilityScale({ score, t }: { score: number; t: Dictionary["secondaryMetrics"]["readabilityModal"] }) {
+  const levels = [
+    { label: t.veryDifficult, min: 0, max: 30 },
+    { label: t.difficult, min: 30, max: 50 },
+    { label: t.medium, min: 50, max: 60 },
+    { label: t.easy, min: 60, max: 70 },
+    { label: t.veryEasy, min: 70, max: 100 },
+  ]
 
-function ReadabilityScale({ score }: { score: number }) {
   return (
     <div className="space-y-1">
       <div className="flex gap-0.5">
-        {READABILITY_LEVELS.map((level) => {
+        {levels.map((level) => {
           const isActive = score >= level.min && score < level.max
             || (level.max === 100 && score >= level.min)
           return (
@@ -576,8 +651,57 @@ function ReadabilityScale({ score }: { score: number }) {
         })}
       </div>
       <div className="flex justify-between text-[10px] text-muted-foreground">
-        <span>Schwer</span>
-        <span>Leicht</span>
+        <span>{t.scaleHard}</span>
+        <span>{t.scaleEasy}</span>
+      </div>
+    </div>
+  )
+}
+
+// ── AI Content helpers ────────────────────────────────────────────────
+
+function aiContentLabel(score: number, t: Dictionary["secondaryMetrics"]["aiContentModal"]): string {
+  if (score >= 75) return t.veryLikely
+  if (score >= 50) return t.likely
+  if (score >= 25) return t.unlikely
+  return t.veryUnlikely
+}
+
+function aiContentColor(score: number): string {
+  if (score >= 75) return "bg-red-500/15 text-red-700 dark:text-red-400"
+  if (score >= 50) return "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+  if (score >= 25) return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+  return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+}
+
+function AiContentScale({ score, t }: { score: number; t: Dictionary["secondaryMetrics"]["aiContentModal"] }) {
+  const levels = [
+    { label: t.veryUnlikely, min: 0, max: 25 },
+    { label: t.unlikely, min: 25, max: 50 },
+    { label: t.likely, min: 50, max: 75 },
+    { label: t.veryLikely, min: 75, max: 100 },
+  ]
+
+  return (
+    <div className="space-y-1">
+      <div className="flex gap-0.5">
+        {levels.map((level) => {
+          const isActive = score >= level.min && score < level.max
+            || (level.max === 100 && score >= level.min)
+          return (
+            <div
+              key={level.label}
+              className={cn(
+                "h-2 flex-1 rounded-full transition-colors",
+                isActive ? "bg-primary" : "bg-muted",
+              )}
+            />
+          )
+        })}
+      </div>
+      <div className="flex justify-between text-[10px] text-muted-foreground">
+        <span>{t.scaleHuman}</span>
+        <span>{t.scaleAi}</span>
       </div>
     </div>
   )

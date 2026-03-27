@@ -1,6 +1,7 @@
 import type { CheerioAPI } from "cheerio";
 import type { LinkData, PageMetrics, KeywordEntry } from "@/lib/types";
 import { STOP_WORDS, TOP_KEYWORDS_COUNT, MIN_KEYWORD_LENGTH } from "@/lib/constants";
+import { detectAiContent } from "./ai-content-detector";
 
 export function calculateMetrics(
   $: CheerioAPI,
@@ -36,6 +37,9 @@ export function calculateMetrics(
   // Readability (Flesch-Amstad for German)
   const readabilityScore = computeReadability(visibleText, words);
 
+  // AI content detection
+  const aiContent = detectAiContent(visibleText, words);
+
   // Page size
   const pageSizeBytes = Buffer.byteLength(html, "utf-8");
 
@@ -48,6 +52,7 @@ export function calculateMetrics(
     readabilityScore,
     pageSizeBytes,
     loadTimeMs,
+    aiContent,
   };
 }
 

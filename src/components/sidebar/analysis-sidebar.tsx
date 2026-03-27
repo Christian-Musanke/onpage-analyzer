@@ -8,6 +8,7 @@ import { HeadingTree } from "./heading-tree"
 import { MediaAccordion } from "./media-accordion"
 import { SchemaDisplay } from "./schema-display"
 import { SecondaryMetrics } from "./secondary-metrics"
+import { useLang } from "@/components/lang-provider"
 import type { SeoData, PageMetrics, LinkData, LinkStatus, HeadingNode } from "@/lib/types"
 
 interface AnalysisSidebarProps {
@@ -35,12 +36,14 @@ export function AnalysisSidebar({
   focusedSection,
   onFocusSection,
 }: AnalysisSidebarProps) {
+  const { t } = useLang()
+
   return (
     <ScrollArea className="h-full">
       <div className="space-y-5 p-4">
         {/* Primary SEO Info */}
         <section className="space-y-2">
-          <SectionHeader>SEO-Grundlagen</SectionHeader>
+          <SectionHeader>{t.sidebar.seoBasics}</SectionHeader>
           <PrimaryInfo seo={seo} />
         </section>
 
@@ -48,7 +51,7 @@ export function AnalysisSidebar({
 
         {/* Robots */}
         <section className="space-y-2">
-          <SectionHeader>Robots</SectionHeader>
+          <SectionHeader>{t.sidebar.robots}</SectionHeader>
           <RobotsInfo robots={seo.robots} />
         </section>
 
@@ -56,7 +59,7 @@ export function AnalysisSidebar({
 
         {/* Heading Structure */}
         <section className="space-y-2">
-          <SectionHeader>Heading-Struktur</SectionHeader>
+          <SectionHeader>{t.sidebar.headingStructure}</SectionHeader>
           <HeadingTree
             headings={seo.headings}
             focusedSection={focusedSection}
@@ -68,7 +71,7 @@ export function AnalysisSidebar({
 
         {/* Media */}
         <section className="space-y-2">
-          <SectionHeader>Medien</SectionHeader>
+          <SectionHeader>{t.sidebar.media}</SectionHeader>
           <MediaAccordion media={seo.media} />
         </section>
 
@@ -76,7 +79,7 @@ export function AnalysisSidebar({
 
         {/* Schema */}
         <section className="space-y-2">
-          <SectionHeader>Structured Data</SectionHeader>
+          <SectionHeader>{t.sidebar.structuredData}</SectionHeader>
           <SchemaDisplay schema={seo.schema} />
         </section>
 
@@ -84,7 +87,7 @@ export function AnalysisSidebar({
 
         {/* Metrics */}
         <section className="space-y-2">
-          <SectionHeader>Metriken</SectionHeader>
+          <SectionHeader>{t.sidebar.metrics}</SectionHeader>
           <SecondaryMetrics
             metrics={metrics}
             links={links}

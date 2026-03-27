@@ -1,10 +1,12 @@
 "use client"
 
-import { ExternalLink, Globe } from "lucide-react"
+import { Calendar, ExternalLink, Globe, User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
-import type { SeoData } from "@/lib/types"
+import { useLang } from "@/components/lang-provider"
+import type { ArticleMeta, SeoData } from "@/lib/types"
+import type { Dictionary } from "@/lib/i18n"
 
 interface PrimaryInfoProps {
   seo: SeoData
@@ -33,22 +35,18 @@ const statusColors = {
   bad: "bg-red-500",
 } as const
 
-const statusLabels = {
-  good: "Optimal",
-  warn: "Akzeptabel",
-  bad: "Nicht optimal",
-} as const
-
 function LengthBar({
   length,
   min,
   max,
   ceiling,
+  labels,
 }: {
   length: number
   min: number
   max: number
   ceiling: number
+  labels: { good: string; warn: string; bad: string }
 }) {
   const status = lengthStatus(length, min, max)
   const pct = Math.min(100, (length / ceiling) * 100)
@@ -78,7 +76,7 @@ function LengthBar({
           status === "bad" && "text-red-600 dark:text-red-400",
         )}
       >
-        {statusLabels[status]}
+        {labels[status]}
       </span>
     </div>
   )
@@ -87,6 +85,14 @@ function LengthBar({
 // ── Component ───────────────────────────────────────────────────────────
 
 export function PrimaryInfo({ seo }: PrimaryInfoProps) {
+  const { t } = useLang()
+
+  const statusLabels = {
+    good: t.primaryInfo.optimal,
+    warn: t.primaryInfo.acceptable,
+    bad: t.primaryInfo.notOptimal,
+  }
+
   return (
     <div className="space-y-3">
       {/* Title */}
@@ -95,7 +101,7 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
           Title{" "}
           {seo.title ? (
             <span className="text-foreground/60">
-              ({seo.title.length} Zeichen)
+              ({seo.title.length} {t.primaryInfo.characters})
             </span>
           ) : null}
         </p>
@@ -107,11 +113,12 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
               min={TITLE_MIN}
               max={TITLE_MAX}
               ceiling={80}
+              labels={statusLabels}
             />
           </>
         ) : (
           <p className="text-sm text-muted-foreground italic">
-            Nicht vorhanden
+            {t.primaryInfo.notPresent}
           </p>
         )}
       </div>
@@ -124,7 +131,7 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
           Meta Description{" "}
           {seo.metaDescription ? (
             <span className="text-foreground/60">
-              ({seo.metaDescription.length} Zeichen)
+              ({seo.metaDescription.length} {t.primaryInfo.characters})
             </span>
           ) : null}
         </p>
@@ -136,11 +143,12 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
               min={META_MIN}
               max={META_MAX}
               ceiling={200}
+              labels={statusLabels}
             />
           </>
         ) : (
           <p className="text-sm text-muted-foreground italic">
-            Nicht vorhanden
+            {t.primaryInfo.notPresent}
           </p>
         )}
       </div>
@@ -163,10 +171,18 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
           </a>
         ) : (
           <p className="text-sm text-muted-foreground italic">
-            Nicht vorhanden
+            {t.primaryInfo.notPresent}
           </p>
         )}
       </div>
+
+      {/* Article Meta: Dates & Authors */}
+      {seo.articleMeta && (
+        <>
+          <Separator />
+          <ArticleMetaSection articleMeta={seo.articleMeta} t={t.primaryInfo} />
+        </>
+      )}
 
       {/* Hreflang Tags */}
       {seo.hreflang.length > 0 && (
@@ -194,6 +210,94 @@ export function PrimaryInfo({ seo }: PrimaryInfoProps) {
             </div>
           </div>
         </>
+      )}
+    </div>
+  )
+}
+
+// ── Article metadata (dates + authors) ──────────────────────────────────
+
+function formatDate(iso: string, locale: string): string {
+  try {
+    const date = new Date(iso)
+    if (isNaN(date.getTime())) return iso
+    return date.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  } catch {
+    return iso
+  }
+}
+
+function ArticleMetaSection({
+  articleMeta,
+  t,
+}: {
+  articleMeta: ArticleMeta
+  t: Dictionary["primaryInfo"]
+}) {
+  const { lang } = useLang()
+  const locale = lang === "de" ? "de-DE" : "en-US"
+
+  const hasAnyDate =
+    articleMeta.datePublished || articleMeta.dateModified || articleMeta.dateCreated
+  const hasAuthors = articleMeta.authors.length > 0
+
+  return (
+    <div className="space-y-2">
+      {/* Dates */}
+      {hasAnyDate && (
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-muted-foreground">
+            <Calendar className="inline size-3 mr-1" />
+            {t.articleDates}
+          </p>
+          <div className="space-y-1 text-sm">
+            {articleMeta.datePublished && (
+              <div className="flex justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{t.published}</span>
+                <span className="text-xs font-medium">
+                  {formatDate(articleMeta.datePublished, locale)}
+                </span>
+              </div>
+            )}
+            {articleMeta.dateModified && (
+              <div className="flex justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{t.lastModified}</span>
+                <span className="text-xs font-medium">
+                  {formatDate(articleMeta.dateModified, locale)}
+                </span>
+              </div>
+            )}
+            {articleMeta.dateCreated && (
+              <div className="flex justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{t.created}</span>
+                <span className="text-xs font-medium">
+                  {formatDate(articleMeta.dateCreated, locale)}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Authors */}
+      {hasAuthors && (
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-muted-foreground">
+            <User className="inline size-3 mr-1" />
+            {articleMeta.authors.length === 1 ? t.author : t.authors}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {articleMeta.authors.map((name, i) => (
+              <Badge key={i} variant="secondary" className="text-xs">
+                {name}
+              </Badge>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

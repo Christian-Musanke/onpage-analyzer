@@ -8,6 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLang } from "@/components/lang-provider";
 
 type GroupNodeData = {
   label: string;
@@ -16,6 +17,7 @@ type GroupNodeData = {
 
 function GroupNodeComponent({ data }: NodeProps) {
   const { label, childCount } = data as unknown as GroupNodeData;
+  const { t } = useLang();
 
   return (
     <Tooltip>
@@ -39,11 +41,10 @@ function GroupNodeComponent({ data }: NodeProps) {
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-sm flex-col items-start gap-1">
         <p>
-          Pfad: {label} · {childCount} {childCount === 1 ? "Link" : "Links"}
+          {t.graph.path}: {label} · {childCount} {childCount === 1 ? t.graph.link : t.graph.linksPlural}
         </p>
         <p className="text-sm opacity-80">
-          Gruppierungsknoten – dieser Pfad wird nicht direkt verlinkt, fasst
-          aber untergeordnete Links zusammen.
+          {t.graph.groupTooltip}
         </p>
       </TooltipContent>
     </Tooltip>

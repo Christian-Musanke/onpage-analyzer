@@ -34,6 +34,14 @@ export interface SeoData {
   media: MediaData;
   schema: SchemaItem[];
   robots: RobotsData;
+  articleMeta: ArticleMeta | null;
+}
+
+export interface ArticleMeta {
+  datePublished: string | null;
+  dateModified: string | null;
+  dateCreated: string | null;
+  authors: string[];
 }
 
 export interface HreflangTag {
@@ -65,6 +73,14 @@ export interface MediaItem {
 export interface SchemaItem {
   type: string;
   raw: Record<string, unknown>;
+  /** Validation issues detected in this schema item. */
+  issues: SchemaIssue[];
+}
+
+export interface SchemaIssue {
+  severity: "error" | "warning";
+  message: string;
+  path?: string;
 }
 
 export interface RobotsData {
@@ -106,6 +122,20 @@ export interface PageMetrics {
   readabilityScore: number;
   pageSizeBytes: number;
   loadTimeMs: number;
+  aiContent: AiContentMetrics;
+}
+
+export interface AiContentMetrics {
+  /** Overall AI probability score (0-100, higher = more likely AI). */
+  score: number;
+  /** Type-Token Ratio — vocabulary diversity (0-1, lower = less diverse). */
+  vocabularyDiversity: number;
+  /** Standard deviation of sentence lengths (lower = more uniform / AI-like). */
+  sentenceLengthStdDev: number;
+  /** Number of detected common AI phrases. */
+  aiPhraseCount: number;
+  /** The detected AI phrases. */
+  aiPhrases: string[];
 }
 
 export interface KeywordEntry {

@@ -19,6 +19,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUrlPreview } from "@/hooks/use-url-preview";
+import { useLang } from "@/components/lang-provider";
+import { interp } from "@/lib/i18n";
 import type { LinkData, LinkStatus } from "@/lib/types";
 
 interface ConfirmDialogProps {
@@ -47,12 +49,13 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const url = link?.href ?? "";
   const { preview, isLoading } = useUrlPreview(open ? url : "");
+  const { t } = useLang();
 
   return (
     <AlertDialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <AlertDialogContent className="!max-w-lg sm:!max-w-xl">
         <AlertDialogHeader className="!text-left !place-items-start">
-          <AlertDialogTitle>Neue URL analysieren?</AlertDialogTitle>
+          <AlertDialogTitle>{t.confirmDialog.title}</AlertDialogTitle>
         </AlertDialogHeader>
 
         {/* URL */}
@@ -66,7 +69,7 @@ export function ConfirmDialog({
           {link && (
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <Badge variant={link.isInternal ? "default" : "secondary"} className="text-[10px]">
-                {link.isInternal ? "Intern" : "Extern"}
+                {link.isInternal ? t.confirmDialog.internal : t.confirmDialog.external}
               </Badge>
               {status?.statusCode && (
                 <Badge variant="outline" className="text-[10px]">
@@ -84,7 +87,7 @@ export function ConfirmDialog({
               )}
               {link.text && (
                 <span className="text-[10px] text-muted-foreground">
-                  Ankertext: &quot;{link.text}&quot;
+                  {t.confirmDialog.anchorText}: &quot;{link.text}&quot;
                 </span>
               )}
             </div>
@@ -100,14 +103,14 @@ export function ConfirmDialog({
               <div>
                 <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1">
                   <FileText className="size-3" />
-                  Titel
+                  {t.confirmDialog.titleLabel}
                 </div>
                 {isLoading ? (
                   <Skeleton className="h-4 w-3/4" />
                 ) : preview?.title ? (
                   <p className="text-sm break-words">{preview.title}</p>
                 ) : (
-                  <p className="text-xs italic text-muted-foreground">Nicht verfügbar</p>
+                  <p className="text-xs italic text-muted-foreground">{t.confirmDialog.notAvailable}</p>
                 )}
               </div>
 
@@ -115,7 +118,7 @@ export function ConfirmDialog({
               <div>
                 <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1">
                   <FileText className="size-3" />
-                  Meta Description
+                  {t.confirmDialog.metaDescription}
                 </div>
                 {isLoading ? (
                   <div className="space-y-1.5">
@@ -127,7 +130,7 @@ export function ConfirmDialog({
                     {preview.metaDescription}
                   </p>
                 ) : (
-                  <p className="text-xs italic text-muted-foreground">Nicht verfügbar</p>
+                  <p className="text-xs italic text-muted-foreground">{t.confirmDialog.notAvailable}</p>
                 )}
               </div>
 
@@ -135,7 +138,7 @@ export function ConfirmDialog({
               <div>
                 <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1">
                   <Heading className="size-3" />
-                  Überschriften-Struktur
+                  {t.confirmDialog.headingStructure}
                 </div>
                 {isLoading ? (
                   <div className="space-y-1.5">
@@ -160,13 +163,13 @@ export function ConfirmDialog({
                     ))}
                     {preview.headings.length > 20 && (
                       <p className="text-[10px] text-muted-foreground pl-3 pt-1">
-                        +{preview.headings.length - 20} weitere Überschriften
+                        {interp(t.confirmDialog.moreHeadings, { count: preview.headings.length - 20 })}
                       </p>
                     )}
                   </div>
                 ) : (
                   <p className="text-xs italic text-muted-foreground">
-                    {isLoading ? "" : "Keine Überschriften gefunden"}
+                    {isLoading ? "" : t.confirmDialog.noHeadings}
                   </p>
                 )}
               </div>
@@ -175,7 +178,7 @@ export function ConfirmDialog({
               {isLoading && (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3 animate-spin" />
-                  Lade Vorschau…
+                  {t.confirmDialog.loadingPreview}
                 </div>
               )}
             </div>
@@ -183,9 +186,9 @@ export function ConfirmDialog({
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Abbrechen</AlertDialogCancel>
+          <AlertDialogCancel onClick={onCancel}>{t.confirmDialog.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>
-            Analysieren
+            {t.confirmDialog.analyze}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
